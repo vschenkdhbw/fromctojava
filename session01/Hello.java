@@ -6,5 +6,10 @@ public class Hello {
         double temp = 19.3; 
         System.out.println("Temperatur: " + temp); 
         System.err.println("Temperatur: " + temp);
+        SensorReading reading = new SensorReading(-300);
+        // System.out.println("Sensor-Temperatur: " + reading.temperatureC);   
+        reading.setTemperatureC(1000);
+        // System.out.println("Sensor-Temperatur end: " + reading.temperatureC);
+        System.out.println("Sensor-Temperatur getter: " + reading.getTemperatureF());
     } 
 } 
