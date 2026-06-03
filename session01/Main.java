@@ -24,8 +24,27 @@ public class Main {
         }
         handler.close();
     }
-
+    /* 
+     * eine Illustration wie man das Interface-Konzept
+     * in diesem Fall sinnvoll nutzen könnte:
+     * 1. um die gleichen Daten mehrfach zu verarbeiten (console + memory)
+     * 2. um zur Laufzeit zu entscheiden, welche Verarbeitung man haben möchte
+     *
+     *
+        // Pattern 1: Direktes Aufrufen der Handler-Methoden
+        processAll(data, new ConsolePrinter());
+        processAll(data, new InMemoryStore());
+        
+        // Pattern 2: at startup
+        String mode = args[0]; // "console" or "memory"
+        SensorDataHandler handler = mode.equals("console")
+            ? new ConsolePrinter()
+            : new InMemoryStore();
+        processAll(data, handler);
+    
+    **************************************************************/
     public static void main(String[] args) {
+        
         Describable d1 = new SensorReading(1, "S1", 19.3, 64.2);
         Describable d2 = new Station("Nord", "Freiburg");
         System.out.println("DESCRIBE d1: " + d1.describe());
@@ -54,9 +73,11 @@ public class Main {
         // ── Kapselung: Setter-Validierung ─────────────────────────────────
         System.out.println("=== Setter-Validierung ===");
         SensorReading r = new SensorReading(5, "S2", 20.0, 55.0);
+        
         System.out.println("Vor Setter:  " + r.describe());
 
         r.setTemperatureC(-999.0);  // wird abgefangen
+        r.temperatureC = -999.0; // ← diese Zeile hinzufügen
         System.out.println("Nach Setter: " + r.describe());
 
         // Das hier kompiliert nicht — Beweis dass private funktioniert:
