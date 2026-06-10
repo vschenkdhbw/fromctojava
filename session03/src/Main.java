@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.io.FileWriter;
+import java.io.Writer;
 
 /**
  * Main
@@ -51,10 +53,17 @@ public class Main {
         }
     }
 
+    
+
+
     // ── main ──────────────────────────────────────────────────────────────────
 
-    public static void main(String[] args) {
-
+    public static void main(String[] args) throws Exception {
+        Writer fw = new FileWriter("test1.txt");
+        fw.write("Zeile 1\n");
+        fw.write("Zeile 2\n");
+        fw.write("Zeile 3\n");
+        fw.close();
         // ── 1. SensorDataHandler: processAll wie in Session 02 ───────────────
         System.out.println("═══ SensorDataHandler ═══");
 
@@ -85,8 +94,10 @@ public class Main {
 
         List<Integer> zahlen    = new ArrayList<>();
         List<String>  namen     = new ArrayList<>();
+        // List<int> intListe = new ArrayList<>();  // Fehler: int ist kein Referenztyp
 
         zahlen.add(10); zahlen.add(20); zahlen.add(30); zahlen.add(40); zahlen.add(50);
+        zahlen.add(null);  // erlaubt, aber vorsichtig damit!
         namen.add("Freiburg"); namen.add("Müllheim"); namen.add("Basel");
         namen.add("Breisach"); namen.add("Staufen");
 
