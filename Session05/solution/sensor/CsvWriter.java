@@ -1,84 +1,84 @@
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 
 /**
- * CsvWriter
+ * CsvWriter — Session 04, bereinigt in Session 06
  *
- * Implementiert SensorDataHandler.
- * Schreibt jedes empfangene SensorReading als CSV-Zeile in eine Datei.
+ * Schreibt SensorReadings als CSV-Zeilen in eine Datei.
+ * Erbt null-Check und Zähler von AbstractSensorHandler.
  *
- * CSV-Format: seq,stationId,temperatureC,humidityPct
- * Beispiel:   1,S1,19.3,64.2
+ * Session 06 — was sich geändert hat:
  *
- * Design by Contract:
- *   Konstruktor:
- *     Postcondition — Datei ist geöffnet, writer ist bereit.
- *     Wirft IOException wenn die Datei nicht geöffnet werden kann.
+ *   1. throws Exception → throws IOException im Konstruktor
+ *      throws Exception sagt: "irgendetwas kann schiefgehen".
+ *      throws IOException sagt: "genau dieser externe Fehler ist möglich — und warum."
+ *      Der Aufrufer weiß jetzt was ihn erwartet. Das ist ehrliche Kapselung.
  *
- *   handle(reading):
- *     Precondition  — close() wurde noch nicht aufgerufen (writer != null).
- *     Postcondition — Eine CSV-Zeile wurde in den Puffer geschrieben.
- *                     Bei reading == null: keine Zeile, kein Absturz.
- *                     Bei writer == null:  keine Zeile, kein Absturz.
- *
- *   close():
- *     Postcondition — Puffer ist auf die Festplatte geschrieben,
- *                     Datei ist geschlossen, writer == null.
- *     Invariante    — Darf mehrfach aufgerufen werden (null-Guard).
- *
- * Wichtig: handle() kann keine IOException weiterreichen, weil
- * SensorDataHandler.handle() keine throws-Klausel deklariert.
- * IOException wird daher intern behandelt (catch in handle()).
+ *   2. close() mit try/finally abgesichert
+ *      super.close() muss immer laufen — auch wenn writer.close() eine IOException wirft.
+ *      finally garantiert das.
  */
-public class CsvWriter implements SensorDataHandler {
+public class CsvWriter extends AbstractSensorHandler {
 
     private BufferedWriter writer;
 
     /**
      * Öffnet die CSV-Datei zum Schreiben.
-     * Überschreibt eine vorhandene Datei (kein append).
      *
-     * @param filename  Pfad zur Ausgabedatei
-     * @throws IOException wenn die Datei nicht geöffnet werden kann
+     * throws IOException — nicht throws Exception.
+     * IOException ist der spezifische Fehler der hier auftreten kann:
+     * Pfad existiert nicht, keine Schreibrechte, Festplatte voll.
+     * Den Aufrufer mit throws Exception im Dunkeln zu lassen wäre
+     * eine Verletzung des Vertrags.
      */
     public CsvWriter(String filename) throws IOException {
         this.writer = new BufferedWriter(new FileWriter(filename));
     }
 
     /**
-     * Schreibt eine CSV-Zeile für das übergebene Reading.
-     * Bei reading == null oder nach close(): stilles Ignorieren.
+     * Schreibt eine CSV-Zeile: seq,stationId,temperatureC,humidityPct
+     *
+     * process() kann throws IOException nicht deklarieren —
+     * die abstrakte Methode in AbstractSensorHandler hat keine checked Exception
+     * in ihrer Signatur. IOException wird daher auf System.err geloggt.
+     *
+     * Precondition (garantiert durch AbstractSensorHandler.handle()):
+     *   reading ist nicht null.
      */
     @Override
-    public void handle(SensorReading reading) {
-        if (reading == null) return;
-        if (writer == null) return;   // close() wurde bereits aufgerufen
+    protected void process(SensorReading reading) {
         try {
-            writer.write(reading.getSeq() + ","
-                       + reading.getStationId() + ","
-                       + reading.getTemperatureC() + ","
-                       + reading.getHumidityPct());
-            writer.newLine();          // plattformunabhängig: \r\n auf Windows, \n auf Unix
+            writer.write(
+                reading.getSeq()          + ","
+                + reading.getStationId()  + ","
+                + reading.getTemperatureC() + ","
+                + reading.getHumidityPct()
+            );
+            writer.newLine();
         } catch (IOException e) {
-            System.err.println("CsvWriter: Fehler beim Schreiben — " + e.getMessage());
+            System.err.println("CsvWriter: Schreibfehler — " + e.getMessage());
         }
     }
 
     /**
-     * Leert den Puffer, schreibt alle Daten auf die Festplatte
-     * und schließt die Datei.
-     * Darf mehrfach aufgerufen werden.
+     * Schließt den BufferedWriter und gibt die Zähler-Zusammenfassung aus.
+     *
+     * Warum log-and-continue statt rethrow?
+     *
+     *   Option A — auf System.err loggen, dann super.close() (gewählt):
+     *     Der Fehler wird sichtbar. super.close() läuft garantiert.
+     *     Das ist das Verhalten der Java-Standardbibliothek (z.B. InputStream.close()).
+     *
+     *   Option B — IOException weiterwerfen (throws IOException in Signatur):
+     *     Problem: wenn bereits eine Exception in flight ist (z.B. aus process()),
+     *     würde eine zweite Exception aus close() die erste still verschlucken.
+     *     Dieses "exception masking" ist ein bekannter Java-Fallstrick.
+     *     Deshalb: close()-Fehler loggen, nicht werfen.
+     *
+     *   Option C — leer fangen:
+     *     Stilles Versagen — genau das was wir im Opener gezeigt haben. Niemals.
      */
     @Override
     public void close() {
-        if (writer == null) return;
-        try {
-            writer.close();            // flush() + Datei schließen
-        } catch (IOException e) {
-            System.err.println("CsvWriter: Fehler beim Schließen — " + e.getMessage());
-        } finally {
-            writer = null;             // Guard: verhindert Doppel-close und NPE in handle()
-        }
+       // hier kommt Euer Code hin  
     }
 }

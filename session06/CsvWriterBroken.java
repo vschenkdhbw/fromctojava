@@ -1,5 +1,4 @@
-import java.io.*;
-import 
+import java.io.*; 
 
 /**
  * CsvWriterBroken — Session 06, Opener
@@ -28,16 +27,19 @@ public class CsvWriterBroken {
 
     public static void main(String[] args) {
         try {
-            Writer fw = new FileWriter("/bingbong/tmp/broken.csv");
+            Writer fw = new FileWriter("/blahblah007/tmp/broken.csv");
             BufferedWriter bw = new BufferedWriter(fw);
             bw.write("1,S1,19.3,64.2");
             bw.newLine();
             bw.write("2,S1,22.1,61.0");
             bw.newLine();
             bw.close();
+        } catch (IOException e) {
+            // Fehler ignorieren  ← das ist das Problem
+            System.out.println("IOFehler: " + e.getMessage());  // das wäre die bessere Alternative
         } catch (Exception e) {
             // Fehler ignorieren  ← das ist das Problem
-            println("Fehler: " + e.getMessage());  // das wäre die bessere Alternative
+            System.out.println("Generic Fehler: " + e.getMessage());  // das wäre die bessere Alternative
         }
 
         System.out.println("Fertig.");   // erscheint immer — auch wenn nichts geschrieben wurde
