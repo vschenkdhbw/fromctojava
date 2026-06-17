@@ -1,0 +1,50 @@
+PROBEKLAUSUR 1 — TEIL A — ANTWORTEN
+Name: ______________________   Matrikelnr.: ______________________
+(Heute online: hier hineintippen. In der echten Klausur: auf Papier.)
+
+============================================================
+A1 · BEGRIFFE
+============================================================
+1) private — was wird erzwungen, wer darf noch zugreifen:
+
+
+2) BufferedWriter.close() — die zwei Dinge:
+
+
+3) checked vs. unchecked Exception — je ein Beispiel:
+
+
+4) Interface-Vertrag — garantiert / garantiert NICHT:
+
+
+5) Vorteil List<SensorReading> gegenueber Array:
+
+
+============================================================
+A2 · CODE LESEN
+============================================================
+a) Erwartete Ausgabe Zeile fuer Zeile:
+
+
+
+b) Warum laeuft trotzdem die richtige describe()-Methode (1 Satz):
+
+
+============================================================
+A3 · FEHLER FINDEN
+============================================================
+(a) Bedeutung der Compiler-Meldung + minimale Korrektur:
+
+
+(b) Warum ist die Datei leer? Welche Vertragsbedingung, welche Methode:
+
+
+============================================================
+A4 · DESIGNFRAGE (C <-> Java)
+============================================================
+- Was gewinnt die Interface-Version bei einem dritten Format:
+
+- Was kostet sie:
+
+- Wann reicht die C-Stil-Methode:
+
